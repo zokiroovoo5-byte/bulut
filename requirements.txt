@@ -1,0 +1,1 @@
+# Python Serverless standart kutubxonalar (http.server, json, urllib) orqali ishlaydi.

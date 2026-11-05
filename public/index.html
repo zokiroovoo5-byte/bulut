@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulutli Kalkulyator - CI/CD Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between p-4 md:p-8">
+
+  <!-- Asosiy sarlavha qismi -->
+  <header class="max-w-4xl mx-auto w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+    <div>
+      <h1 class="text-xl font-bold text-slate-900 tracking-tight">Bulutli Texnologiyalar</h1>
+      <p class="text-xs text-slate-500 mt-0.5">Namangan Davlat Texnika Universiteti | ATT kafedrasi (3-kurs)</p>
+    </div>
+    <div class="flex items-center gap-2 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span>CI/CD Pipeline: GitHub va Vercel</span>
+    </div>
+  </header>
+
+  <!-- Asosiy bloklar -->
+  <main class="max-w-4xl mx-auto w-full my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    
+    <!-- Kalkulyator kartasi -->
+    <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded">Serverless FaaS</span>
+          <h2 class="text-xl font-bold text-slate-900 mt-2">Python Bulutli Hisoblagich</h2>
+        </div>
+        <button onclick="checkHealth()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-300 font-medium transition">
+          Health Check
+        </button>
+      </div>
+
+      <!-- Kiritish maydonlari -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">1-Son (A):</label>
+          <input id="numA" type="number" step="any" value="25" placeholder="Masalan: 25" class="w-full bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-slate-900 font-mono text-base rounded-xl px-4 py-2.5 outline-none transition">
+        </div>
+
+        <!-- Matematik amal tanlash -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Matematik amal:</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="setOp('+')" class="op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-blue-600 border-blue-600 text-white" data-op="+">+</button>
+            <button type="button" onclick="setOp('-')" class="op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200" data-op="-">-</button>
+            <button type="button" onclick="setOp('*')" class="op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200" data-op="*">×</button>
+            <button type="button" onclick="setOp('/')" class="op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200" data-op="/">÷</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">2-Son (B):</label>
+          <input id="numB" type="number" step="any" value="75" placeholder="Masalan: 75" class="w-full bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 text-slate-900 font-mono text-base rounded-xl px-4 py-2.5 outline-none transition">
+        </div>
+
+        <!-- Hisoblash tugmasi -->
+        <button id="calcBtn" onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm py-3 px-6 rounded-xl transition duration-150 flex items-center justify-center">
+          <span id="btnText">Bulutda hisoblash (Python API)</span>
+        </button>
+      </div>
+
+      <!-- Natija bloki -->
+      <div id="resultCard" class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+          <span>Python Serverless Natijasi:</span>
+          <span id="statusBadge" class="text-xs font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700">Kutilmoqda...</span>
+        </div>
+        <div class="text-2xl font-bold text-slate-900 font-mono" id="resultDisplay">
+          25 + 75 = 100
+        </div>
+        <p class="text-xs text-slate-500 mt-2" id="serverInfo">
+          Hisoblash Vercel bulutida Python 3 runtime orqali bajariladi.
+        </p>
+
+        <!-- JSON tafsilotlar -->
+        <details class="mt-3 pt-3 border-t border-slate-200 text-xs">
+          <summary class="cursor-pointer text-slate-600 hover:text-slate-900 font-mono select-none">
+            Server JSON javobi (batafsil ko'rish)
+          </summary>
+          <pre id="jsonPayload" class="mt-2 p-3 rounded-lg bg-slate-900 text-slate-100 font-mono text-xs overflow-x-auto">{}</pre>
+        </details>
+      </div>
+
+    </div>
+
+    <!-- O'quv ma'lumotlar paneli -->
+    <div class="lg:col-span-5 space-y-6">
+      
+      <!-- CI/CD bosqichlari -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">
+          CI/CD Pipeline Bosqichlari
+        </h3>
+        
+        <ol class="relative border-l border-slate-200 ml-2 space-y-4 text-xs">
+          <li class="ml-4">
+            <span class="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-white bg-slate-400"></span>
+            <strong class="text-slate-900 block font-semibold">1. Kod yozish (Lokal)</strong>
+            <span class="text-slate-500">Dasturchi kompyuterida Python yoki HTML kodiga o'zgartirish kiritadi.</span>
+          </li>
+          <li class="ml-4">
+            <span class="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-white bg-blue-500"></span>
+            <strong class="text-slate-900 block font-semibold">2. GitHub Desktop (Push)</strong>
+            <span class="text-slate-500">Kodni masofaviy repozitoriyga yuborish (git push).</span>
+          </li>
+          <li class="ml-4">
+            <span class="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-white bg-indigo-500"></span>
+            <strong class="text-slate-900 block font-semibold">3. Vercel Webhook (Continuous Deploy)</strong>
+            <span class="text-slate-500">Yangi commitni sezib, serverless funksiyani avtomatik qurish.</span>
+          </li>
+          <li class="ml-4">
+            <span class="absolute -left-1.5 mt-1 w-3 h-3 rounded-full border-2 border-white bg-emerald-500"></span>
+            <strong class="text-slate-900 block font-semibold">4. Global Edge (Zero Downtime)</strong>
+            <span class="text-slate-500">Foydalanuvchilarga to'xtovsiz yangi versiyani yetkazish.</span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Texnologik stek -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 text-xs text-slate-600 space-y-2.5 shadow-sm">
+        <div class="font-bold text-slate-900 text-xs uppercase tracking-wider pb-1 border-b border-slate-100">
+          Texnologik Stek
+        </div>
+        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-500">Backend:</span>
+          <span class="font-mono font-medium text-slate-900">Python 3.12 (Native Serverless)</span>
+        </div>
+        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-500">Frontend:</span>
+          <span class="font-mono font-medium text-slate-900">HTML5 + Tailwind CSS</span>
+        </div>
+        <div class="flex items-center justify-between py-1 border-b border-slate-100">
+          <span class="text-slate-500">PaaS Provayder:</span>
+          <span class="font-mono font-medium text-slate-900">Vercel Inc.</span>
+        </div>
+        <div class="flex items-center justify-between py-1">
+          <span class="text-slate-500">Versiya nazorati:</span>
+          <span class="font-mono font-medium text-slate-900">Git & GitHub</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="max-w-4xl mx-auto w-full text-center text-xs text-slate-500 pt-6 border-t border-slate-200">
+    <p>Namangan Davlat Texnika Universiteti • "Bulutli texnologiyalar" fani o'quv amaliyoti.</p>
+  </footer>
+
+  <script>
+    let currentOp = '+';
+
+    function setOp(op) {
+      currentOp = op;
+      document.querySelectorAll('.op-btn').forEach(btn => {
+        if (btn.dataset.op === op) {
+          btn.className = 'op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-blue-600 border-blue-600 text-white';
+        } else {
+          btn.className = 'op-btn py-2 rounded-xl font-mono text-base font-bold border transition bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200';
+        }
+      });
+    }
+
+    async function checkHealth() {
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.xabar || "Bulut serveri faol ishlamoqda (Status: 200 OK)");
+        } else {
+          alert("Server javob bermadi. Status: " + res.status);
+        }
+      } catch (e) {
+        alert("Tarmoq xatosi: " + e.message);
+      }
+    }
+
+    async function calculate() {
+      const a = document.getElementById('numA').value;
+      const b = document.getElementById('numB').value;
+      const btn = document.getElementById('calcBtn');
+      const btnText = document.getElementById('btnText');
+      const resultCard = document.getElementById('resultCard');
+      const resultDisplay = document.getElementById('resultDisplay');
+      const statusBadge = document.getElementById('statusBadge');
+      const jsonPayload = document.getElementById('jsonPayload');
+
+      if (a === '' || b === '') {
+        alert("Iltimos, ikkala sonni ham kiriting.");
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.innerText = "Hisoblanmoqda...";
+      statusBadge.innerText = "Yuborilmoqda...";
+      statusBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-700";
+
+      try {
+        const url = `/api/add?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}&amal=${encodeURIComponent(currentOp)}`;
+        const start = performance.now();
+        const res = await fetch(url);
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          const txt = await res.text();
+          data = { status: 'error', xato: `Server javobi (${res.status}): ` + txt.substring(0, 80) };
+        }
+        const elapsed = Math.round(performance.now() - start);
+
+        jsonPayload.innerText = JSON.stringify(data, null, 2);
+
+        if (res.ok && data.status === 'success') {
+          resultDisplay.innerText = `${data.a} ${data.amal} ${data.b} = ${data.natija}`;
+          resultDisplay.className = "text-2xl font-bold text-emerald-600 font-mono";
+          statusBadge.innerText = `HTTP 200 OK (${elapsed}ms)`;
+          statusBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800";
+        } else {
+          resultDisplay.innerText = data.xato || "Xatolik yuz berdi!";
+          resultDisplay.className = "text-xl font-bold text-rose-600 font-mono";
+          statusBadge.innerText = `Xato (${res.status})`;
+          statusBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-800";
+        }
+      } catch (err) {
+        resultDisplay.innerText = "Tarmoq xatosi: " + err.message;
+        resultDisplay.className = "text-xl font-bold text-rose-600 font-mono";
+        statusBadge.innerText = "Offline";
+        statusBadge.className = "text-xs font-mono px-2 py-0.5 rounded bg-rose-100 text-rose-800";
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Bulutda hisoblash (Python API)";
+      }
+    }
+  </script>
+</body>
+</html>
